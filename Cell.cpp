@@ -488,7 +488,7 @@ void RealDevice::DriftWrite(int x, int y, double weight, double waitTimeParamete
 
 	if (driftCoeff < 0) driftCoeff = 0;
 
-	conductance *= pow((1e-06 / 60), driftCoeff);
+	conductance *= pow((1e-06 / 3600), driftCoeff);
 
 	if (conductance > maxConductance) {
 		conductance = maxConductance;
