@@ -52,6 +52,8 @@
 #include <time.h>
 #include <chrono>
 
+using namespace std;
+
 extern Param *param;
 
 extern std::vector< std::vector<double> > Input;
