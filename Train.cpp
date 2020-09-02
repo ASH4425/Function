@@ -1087,7 +1087,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 					}
 				}
 			}
-			if (param->currentEpoch == param->totalNumEpochs) {
+			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 2) {
 				param->isFinalTrain = true;
 			}
 			else {
@@ -1099,7 +1099,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 				for (int m = 0; m < param->nHide; m++) {
 					for (int i = 0; i < 4; i++) {
 						for (int n = 100 * i; n < 100 * (i + 1); n++) {
-							string filenameC = "minute_weightIH";
+							string filenameC = "minute1_weightIH";
 							std::ofstream readC;
 							readC.open(filenameC + ".csv", std::ios_base::app);
 							readC << endl;
@@ -1112,7 +1112,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 				for (int m = 0; m < param->nOutput; m++) {
 					for (int i = 0; i < 4; i++) {
 						for (int n = 25 * i; n < 25 * (i + 1); n++) {
-							string filenameD = "minute_weightHO";
+							string filenameD = "minute1_weightHO";
 							std::ofstream readD;
 							readD.open(filenameD + ".csv", std::ios::out | std::ios_base::app);
 							readD << endl;
