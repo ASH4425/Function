@@ -46,6 +46,11 @@
 #include "Array.h"
 #include "Mapping.h"
 #include "NeuroSim.h"
+#include <string.h>
+#include <cmath>
+#include <fstream>
+#include <time.h>
+#include <chrono>
 
 extern Param *param;
 

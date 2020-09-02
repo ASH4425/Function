@@ -155,6 +155,9 @@ public:
 
 	virtual double Read(double voltage) = 0;
 	virtual void Write(double deltaWeightNormalized, double weight, double minWeight, double maxWeight) = 0;
+	/*For Resistance drift effect*/
+	virtual void DriftWrite(int x, int y, double weight, double waitTimeParameter) = 0;
+
 	double GetMaxReadCurrent(){
       if(cmosAccess)
           return readVoltage * 1/(1/avgMaxConductance+resistanceAccess);

@@ -38,6 +38,8 @@
 
 #include "formula.h"
 #include "Array.h"
+#include <cmath>
+#include <iostream>
 
 int counter=0;
 double Array::ReadCell(int x, int y, char* mode) {
