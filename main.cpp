@@ -128,7 +128,7 @@ int main() {
 	srand(0);	// Pseudorandom number seed
 	
 	ofstream mywriteoutfile;
-	mywriteoutfile.open("hour2.csv");                                                                                                            
+	mywriteoutfile.open("day2.csv");                                                                                                            
 	
 	for (int i=1; i<=param->totalNumEpochs/param->interNumEpochs; i++) {
 		param->currentEpoch = i;
