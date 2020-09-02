@@ -207,6 +207,8 @@ public:
 	RealDevice(int x, int y);
 	double Read(double voltage);	// Return read current (A)
 	void Write(double deltaWeightNormalized, double weight, double minWeight, double maxWeight);
+	/*For Resistance drifit effect*/
+	void DriftWrite(int x, int y, double weight, double waitTimeParameter);
 };
 
 class MeasuredDevice: public AnalogNVM {
