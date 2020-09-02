@@ -259,8 +259,8 @@ void IdealDevice::Write(double deltaWeightNormalized, double weight, double minW
 /* Real Device */
 RealDevice::RealDevice(int x, int y) {
 	this->x = x; this->y = y;	// Cell location: x (column) and y (row) start from index 0
-	maxConductance = 3.8462e-8;		// Maximum cell conductance (S)
-	minConductance = 3.0769e-9;	// Minimum cell conductance (S)
+	maxConductance = 4.76e-06;		// Maximum cell conductance (S)
+	minConductance = 0.554e-06;	// Minimum cell conductance (S)
 	avgMaxConductance = maxConductance; // Average maximum cell conductance (S)
 	avgMinConductance = minConductance; // Average minimum cell conductance (S)
 	conductance = minConductance;	// Current conductance (S) (dynamic variable)
@@ -272,32 +272,47 @@ RealDevice::RealDevice(int x, int y) {
 	writePulseWidthLTP = 300e-6;	// Write pulse width (s) for LTP or weight increase
 	writePulseWidthLTD = 300e-6;	// Write pulse width (s) for LTD or weight decrease
 	writeEnergy = 0;	// Dynamic variable for calculation of write energy (J)
-	maxNumLevelLTP = 97;	// Maximum number of conductance states during LTP or weight increase
-	maxNumLevelLTD = 100;	// Maximum number of conductance states during LTD or weight decrease
+	maxNumLevelLTP = 56;	// Maximum number of conductance states during LTP or weight increase
+	maxNumLevelLTD = 64;	// Maximum number of conductance states during LTD or weight decrease
 	numPulse = 0;	// Number of write pulses used in the most recent write operation (dynamic variable)
-	cmosAccess = true;	// True: Pseudo-crossbar (1T1R), false: cross-point
+	cmosAccess = false;	// True: Pseudo-crossbar (1T1R), false: cross-point
     FeFET = false;		// True: FeFET structure (Pseudo-crossbar only, should be cmosAccess=1)
 	gateCapFeFET = 2.1717e-18;	// Gate capacitance of FeFET (F)
 	resistanceAccess = 15e3;	// The resistance of transistor (Ohm) in Pseudo-crossbar array when turned ON
 	nonlinearIV = false;	// Consider I-V nonlinearity or not (Currently for cross-point array only)
 	NL = 10;    // I-V nonlinearity in write scheme (the current ratio between Vw and Vw/2), assuming for the LTP side
+
+	/*For Resistance drift effect*/
+	driftCoeff = 0.1;
+	driftCoeffDepend = 0.2;
+	maxdriftCoeff = 0.1;
+	mindriftCoeff = 0.0;
+	minResistance = 5e05;
+	maxResistance = 2e06;
+
+	/*For Drift D2D variation*/
+	minResistanceSigmaDtoD = 0.0 * 5e05;	// Sigma of device-to-device minResistance vairation in gaussian distribution
+	gaussian_dist_minResistance = new std::normal_distribution<double>(0, minResistanceSigmaDtoD);	// Set up mean and stddev for device-to-device weight update vairation
+	maxdriftCoeffSigmaDtoD = 0.0 * 0.1;	// Sigma of device-to-device minResistance vairation in gaussian distribution
+	gaussian_dist_maxdriftCoeff = new std::normal_distribution<double>(0, maxdriftCoeffSigmaDtoD);	// Set up mean and stddev for device-to-device weight update vairation
+
 	if (nonlinearIV) {  // Currently for cross-point array only
 		double Vr_exp = readVoltage;  // XXX: Modify this value to Vr in the reported measurement data (can be different than readVoltage)
 		// Calculation of conductance at on-chip Vr
 		maxConductance = NonlinearConductance(maxConductance, NL, writeVoltageLTP, Vr_exp, readVoltage);
 		minConductance = NonlinearConductance(minConductance, NL, writeVoltageLTP, Vr_exp, readVoltage);
 	}
-	nonlinearWrite = true;	// Consider weight update nonlinearity or not
-	nonIdenticalPulse = false;	// Use non-identical pulse scheme in weight update or not
+	nonlinearWrite = false;	// Consider weight update nonlinearity or not
+	nonIdenticalPulse = true;	// Use non-identical pulse scheme in weight update or not
 	if (nonIdenticalPulse) {
-		VinitLTP = 2.85;	// Initial write voltage for LTP or weight increase (V)
-		VstepLTP = 0.05;	// Write voltage step for LTP or weight increase (V)
-		VinitLTD = 2.1;		// Initial write voltage for LTD or weight decrease (V)
-		VstepLTD = 0.05; 	// Write voltage step for LTD or weight decrease (V)
-		PWinitLTP = 75e-9;	// Initial write pulse width for LTP or weight increase (s)
-		PWstepLTP = 5e-9;	// Write pulse width for LTP or weight increase (s)
-		PWinitLTD = 75e-9;	// Initial write pulse width for LTD or weight decrease (s)
-		PWstepLTD = 5e-9;	// Write pulse width for LTD or weight decrease (s)
+		VinitLTP = 1.00;	// Initial write voltage for LTP or weight increase (V)
+		VstepLTP = 0.0125;	// Write voltage step for LTP or weight increase (V)
+		VinitLTD = 5.7;		// Initial write voltage for LTD or weight decrease (V)
+		VstepLTD = 0.025; 	// Write voltage step for LTD or weight decrease (V)
+		PWinitLTP = 100e-9;	// Initial write pulse width for LTP or weight increase (s)
+		PWstepLTP = 0;	// Write pulse width for LTP or weight increase (s)
+		PWinitLTD = 100e-9;	// Initial write pulse width for LTD or weight decrease (s)
+		PWstepLTD = 0;	// Write pulse width for LTD or weight decrease (s)
 		writeVoltageSquareSum = 0;	// Sum of V^2 of non-identical pulses (dynamic variable)
 	}
 	readNoise = false;		// Consider read noise or not
@@ -315,9 +330,17 @@ RealDevice::RealDevice(int x, int y) {
 	paramALTP = getParamA(NL_LTP + (*gaussian_dist2)(localGen)) * maxNumLevelLTP;	// Parameter A for LTP nonlinearity
 	paramALTD = getParamA(NL_LTD + (*gaussian_dist2)(localGen)) * maxNumLevelLTD;	// Parameter A for LTD nonlinearity
 
+	/*For Drift D2D variation*/
+	minResistance += (*gaussian_dist_minResistance)(localGen);
+	maxdriftCoeff += (*gaussian_dist_maxdriftCoeff)(localGen);
+
 	/* Cycle-to-cycle weight update variation */
 	sigmaCtoC = 0.035* (maxConductance - minConductance);	// Sigma of cycle-to-cycle weight update vairation: defined as the percentage of conductance range
 	gaussian_dist3 = new std::normal_distribution<double>(0, sigmaCtoC);    // Set up mean and stddev for cycle-to-cycle weight update vairation
+
+	/*For Drift C2C variation*/
+	driftCoeffSigmaC2C = 0.0 * 0.1;
+	gaussian_dist_driftCoeff = new std::normal_distribution<double>(0, driftCoeffSigmaC2C);
 
 	/* Conductance range variation */
 	conductanceRangeVar = false;    // Consider variation of conductance range or not
@@ -438,6 +461,39 @@ void RealDevice::Write(double deltaWeightNormalized, double weight, double minWe
 	conductancePrev = conductance;
 	conductance = conductanceNew;
 }
+
+void RealDevice::DriftWrite(int x, int y, double weight, double waitTimeParameter) {
+
+	driftCoeffDepend = (maxdriftCoeff - mindriftCoeff) / (log10(maxResistance / minResistance));
+
+	if (1 / conductance < minResistance) {
+		driftCoeff = mindriftCoeff;
+	}else if (1 / conductance > maxResistance) {
+		driftCoeff = maxdriftCoeff;
+	}else {
+		driftCoeff = driftCoeffDepend * log10((1 / conductance) / maxResistance) + maxdriftCoeff;
+	}
+
+	if (driftCoeff < mindriftCoeff) driftCoeff = mindriftCoeff;
+	if (driftCoeff > maxdriftCoeff) driftCoeff = maxdriftCoeff;
+
+	/*driftCoeff C2C variation*/
+	extern std::mt19937 gen;
+	if (driftCoeffSigmaC2C != 0) {
+		driftCoeff += (*gaussian_dist_driftCoeff)(gen);
+	}
+
+	if (driftCoeff < 0) driftCoeff = 0;
+
+	conductance *= pow((1e-06 / 60), driftCoeff);
+
+	if (conductance > maxConductance) {
+		conductance = maxConductance;
+	}else if (conductance < minConductance) {
+		conductance = minConductance;
+	}
+}
+
 
 /* Measured device */
 MeasuredDevice::MeasuredDevice(int x, int y) {

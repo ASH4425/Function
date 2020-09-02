@@ -118,6 +118,23 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 	for (int t = 0; t < epochs; t++) {
 		for (int batchSize = 0; batchSize < numTrain; batchSize++) {
 
+			/*For cycleDuration*/
+			double cycleTime = 0.1; // one cycle duration (Write~Read)
+			int cycleArrayIH[param->nHide][param->nInput];
+			int cycleArrayHO[param->nOutput][param->nHide];
+			double cycleWaitTimeIH[param->nHide][param->nInput];
+			double cycleWaitTimeHO[param->nOutput][param->nHide];
+
+			/*cycleArray Initialization*/
+			if (param->currentEpoch == 1 && batchSize == 0) {
+				for (int p = 0; p < param->nHide; p++) {
+					memset(cycleArrayIH[p], 0, sizeof(int) * param->nInput);
+				}
+				for (int q = 0; q < param->nOutput; q++) {
+					memset(cycleArrayHO[q], 0, sizeof(int) * param->nHide);
+				}
+			}
+
 			int i = rand() % param->numMnistTrainImages;  // Randomize sample
             //int i = 1;       // use this value for debug
 			// Forward propagation
@@ -531,7 +548,22 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
                             */
                             
 							if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayIH->cell[jj][k])) {	// Analog eNVM
+
+								/*cycleArray Update*/
+								if (deltaWeight1[jj][k] != 0.0) {
+									cycleArrayIH[jj][k] = 0;
+								}else {
+									cycleArrayIH[jj][k]++;
+								}
+								cycleWaitTimeIH[jj][k] = (cycleArrayIH[jj][k] + 1) * cycleTime;
+
 							    arrayIH->WriteCell(jj, k, deltaWeight1[jj][k], weight1[jj][k], param->maxWeight, param->minWeight, true);
+
+								/*For Resistance drift effect*/
+								if (param->isFinalTrain) {
+									arrayIH->DriftWriteCell(jj, k, weight1[jj][k], cycleWaitTimeIH[jj][k]);
+								}
+
 							    weight1[jj][k] = arrayIH->ConductanceToWeight(jj, k, param->maxWeight, param->minWeight); 
                                 weightChangeBatch = weightChangeBatch || static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->numPulse;
                                 if(fabs(static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->numPulse) > maxPulseNum)
@@ -840,7 +872,23 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
                         */			
 				
 							if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayHO->cell[jj][k])) { // Analog eNVM
+
+								/*cycleArray Update*/
+								if (deltaWeight2[jj][k] != 0.0) {
+									cycleArrayHO[jj][k] = 0;
+								}
+								else {
+									cycleArrayHO[jj][k]++;
+								}
+								cycleWaitTimeHO[jj][k] = (cycleArrayHO[jj][k] + 1) * cycleTime;
+
                                 arrayHO->WriteCell(jj, k, deltaWeight2[jj][k], weight2[jj][k], param->maxWeight, param->minWeight, true);
+
+								/*For Resistance drift effect*/
+								if (param->isFinalTrain) {
+									arrayHO->DriftWriteCell(jj, k, weight2[jj][k], cycleWaitTimeHO[jj][k]);
+								}
+
 							    weight2[jj][k] = arrayHO->ConductanceToWeight(jj, k, param->maxWeight, param->minWeight);
 								weightChangeBatch = weightChangeBatch || static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->numPulse;
                                 if(fabs(static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->numPulse) > maxPulseNum)
@@ -1032,6 +1080,43 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 					}
 				}
 			}
+			if (param->currentEpoch == param->totalNumEpochs) {
+				param->isFinalTrain = true;
+			}
+			else {
+				param->isFinalTrain = false;
+			}
+
+			if (batchSize == numTrain - 1 && (param->currentEpoch == param->totalNumEpochs)) {
+
+				for (int m = 0; m < param->nHide; m++) {
+					for (int i = 0; i < 4; i++) {
+						for (int n = 100 * i; n < 100 * (i + 1); n++) {
+							string filenameC = "minute_weightIH";
+							std::ofstream readC;
+							readC.open(filenameC + ".csv", std::ios_base::app);
+							readC << endl;
+							readC << m << ", " << n; //write Cell index
+							readC << ", " << weight1[m][n];
+							readC.close();
+						}
+					}
+				}
+				for (int m = 0; m < param->nOutput; m++) {
+					for (int i = 0; i < 4; i++) {
+						for (int n = 25 * i; n < 25 * (i + 1); n++) {
+							string filenameD = "minute_weightHO";
+							std::ofstream readD;
+							readD.open(filenameD + ".csv", std::ios::out | std::ios_base::app);
+							readD << endl;
+							readD << m << ", " << n; //write Cell index
+							readD << ", " << weight2[m][n];
+							readD.close();
+
+						}
+					}
+				}
+			}// end of weight tracking code
 		}
     }
 }

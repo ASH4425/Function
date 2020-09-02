@@ -83,6 +83,9 @@ public:
 	double arrayWireWidth;	// Array wire width (nm)
 	int processNode;	// Technology node (nm)
 	double clkFreq;		// Clock frequency (Hz)
+
+	int currentEpoch; //Current Epoch
+	bool isFinalTrain; //Final Training or not
 };
 
 #endif

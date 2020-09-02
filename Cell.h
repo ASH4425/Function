@@ -82,6 +82,14 @@ public:
 	std::normal_distribution<double> *gaussian_dist5;	// Normal distribution object
 	std::normal_distribution<double> *gaussian_dist_maxConductance;	// Normal distribution object
 	std::normal_distribution<double> *gaussian_dist_minConductance;	// Normal distribution object
+
+	/*For Drift D2D variation*/
+	std::normal_distribution<double>* gaussian_dist_minResistance;	// Normal distribution object
+	std::normal_distribution<double>* gaussian_dist_maxdriftCoeff;	// Normal distribution object
+
+	/*For Drift C2C variation*/
+	std::normal_distribution<double>* gaussian_dist_driftCoeff;	// Normal distribution object
+
 	/* Need the 4 variables below if nonlinearIV=true */
 	double conductanceAtVwLTP;		// Conductance at the LTP write voltage
 	double conductanceAtVwLTD;		// Conductance at the LTD write voltage
@@ -90,6 +98,21 @@ public:
 	bool conductanceRangeVar;	// Consider variation of conductance range or not
 	double maxConductanceVar;	// Sigma of maxConductance variation (S)
 	double minConductanceVar;	// Sigma of minConductance variation (S)
+
+	/*For Resistance drift effect*/
+	double driftCoeff; //v
+	double driftCoeffDepend; //k
+	double maxdriftCoeff; //v_max
+	double mindriftCoeff; //v_min
+	double minResistance; //R_min
+	double maxResistance; //R_max
+
+	/*For Drift D2D variation*/
+	double minResistanceSigmaDtoD;	// Sigma of device-to-device minResistance vairation in gaussian distribution
+	double maxdriftCoeffSigmaDtoD;	// Sigma of device-to-device minResistance vairation in gaussian distribution
+
+	/*For Drift C2C variation*/
+	double driftCoeffSigmaC2C;
 };
 
 class SRAM: public Cell {
