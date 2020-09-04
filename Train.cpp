@@ -596,7 +596,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 										}
 									}
 									double vMeanIH = vSumIH / (param->nInput * param->nHide);
-									std::cout << "vMeanIH : " << vMeanIH << std::endl;
+									//std::cout << "vMeanIH : " << vMeanIH << std::endl;
 
 								}
        
