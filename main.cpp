@@ -140,7 +140,7 @@ int main() {
 		mywriteoutfile << i*param->interNumEpochs << ", " << (double)correct/param->numMnistTestImages*100 << endl;
 		
 		if (i== param->totalNumEpochs) {
-			for (int j = 1; j <= 5; j++) {
+			for (int j = 1; j <= 3; j++) {
 				Validate();
 				mywriteoutfile << j << ", " << (double)correct / param->numMnistTestImages * 100 << endl;
 				printf("Accuracy at Final Epoch and %d Tests is : %.2f%\n", j * param->interNumEpochs, (double)correct / param->numMnistTestImages * 100);
