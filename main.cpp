@@ -128,7 +128,7 @@ int main() {
 	srand(0);	// Pseudorandom number seed
 	
 	ofstream mywriteoutfile;
-	mywriteoutfile.open("month2.csv");                                                                                                            
+	mywriteoutfile.open("testSolution.csv");                                                                                                            
 	
 	for (int i=1; i<=param->totalNumEpochs/param->interNumEpochs; i++) {
 		param->currentEpoch = i;
@@ -140,7 +140,7 @@ int main() {
 		mywriteoutfile << i*param->interNumEpochs << ", " << (double)correct/param->numMnistTestImages*100 << endl;
 		
 		if (i== param->totalNumEpochs) {
-			for (int j = 1; j <= 50; j++) {
+			for (int j = 1; j <= 5; j++) {
 				Validate();
 				mywriteoutfile << j << ", " << (double)correct / param->numMnistTestImages * 100 << endl;
 				printf("Accuracy at Final Epoch and %d Tests is : %.2f%\n", j * param->interNumEpochs, (double)correct / param->numMnistTestImages * 100);

@@ -567,7 +567,17 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 							    arrayIH->WriteCell(jj, k, deltaWeight1[jj][k], weight1[jj][k], param->maxWeight, param->minWeight, true);
 
 								/*For Resistance drift effect*/
+								double vSumIH = 0;
 								if (param->isFinalTrain) {
+									/*For slope correction technique*/
+									for (k = 0; k < param->nInput; k++) {
+										for (jj = 0; jj < param->nHide; jj++) {
+											vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->driftCoeff;
+										}
+									}
+									double vMeanIH = vSumIH / (param->nInput * param->nHide);
+									std::cout << "vMeanIH : " << vMeanIH << std::endl;
+									/*Adapt Resistance drfit effect*/
 									arrayIH->DriftWriteCell(jj, k, weight1[jj][k], cycleWaitTimeIH[jj][k]);
 								}
 
@@ -892,7 +902,18 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
                                 arrayHO->WriteCell(jj, k, deltaWeight2[jj][k], weight2[jj][k], param->maxWeight, param->minWeight, true);
 
 								/*For Resistance drift effect*/
+								double vSumHO = 0;
 								if (param->isFinalTrain) {
+									/*For slope correction technique*/
+									for (k = 0; k < param->nHide; k++) {
+										for (jj = 0; jj < param->nOutput; jj++) {
+											vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->driftCoeff;
+										}
+									}
+									double vMeanHO = vSumHO / (param->nHide * param->nOutput);
+									std::cout << "vMeanHO : " << vMeanHO << std::endl;
+
+									/*Adapt Resistance drfit effect*/
 									arrayHO->DriftWriteCell(jj, k, weight2[jj][k], cycleWaitTimeHO[jj][k]);
 								}
 
