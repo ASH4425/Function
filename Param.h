@@ -86,6 +86,10 @@ public:
 
 	int currentEpoch; //Current Epoch
 	bool isFinalTrain; //Final Training or not
+
+	/*For slope correction technique*/
+	double vMeanIHparam;
+	double vMeanHOparam;
 };
 
 #endif

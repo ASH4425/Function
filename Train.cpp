@@ -125,6 +125,13 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 	for (int t = 0; t < epochs; t++) {
 		for (int batchSize = 0; batchSize < numTrain; batchSize++) {
 
+			/*Check if this is the last training or not(using isFInalTrain)*/
+			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+				param->isFinalTrain = true;
+			}else {
+				param->isFinalTrain = false;
+			}
+
 			/*For cycleDuration*/
 			double cycleTime = 0.1; // one cycle duration (Write~Read)
 			int cycleArrayIH[param->nHide][param->nInput];
@@ -262,10 +269,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 						}
 					}
 					a1[j] = sigmoid(outN1[j]);
-					if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-						std::cout << "Final training (ReadIH)" << std::endl;
-						//a1[j] = sigmoidMod(outN1[j]);
-					}
 					da1[j] = round_th(a1[j]*(param->numInputLevel-1), param->Hthreshold);
 				}
 				arrayIH->readEnergy += sumArrayReadEnergy;
@@ -295,11 +298,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 						outN1[j] += Input[i][k] * weight1[j][k];
 					}
 					a1[j] = sigmoid(outN1[j]);
-					if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-						std::cout << "Final training (ReadIH)" << std::endl;
-						//a1[j] = sigmoidMod(outN1[j]);
-					}
-
 				}
         }
 
@@ -788,6 +786,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 					}
 				}
 				double vMeanIH = vSumIH / (param->nInput * param->nHide);
+				param->vMeanIHparam = vMeanIH;
 				std::cout << "vMeanIH : " << vMeanIH << std::endl;
 			}
 
@@ -1125,13 +1124,8 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 					}
 				}
 				double vMeanHO = vSumHO / (param->nHide * param->nOutput);
+				param->vMeanHOparam = vMeanHO;
 				std::cout << "vMeanHO : " << vMeanHO << std::endl;
-			}
-
-			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 2) {
-				param->isFinalTrain = true;
-			}else {
-				param->isFinalTrain = false;
 			}
 
 			if (batchSize == numTrain - 1 && (param->currentEpoch == param->totalNumEpochs)) {
