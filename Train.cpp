@@ -771,8 +771,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 
 			/*For slope correction technique*/
 			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-				std::cout << "Final Training" << std::endl;
-				/*
+				std::cout << "Final Training(IH)" << std::endl;
 				double vSumIH = 0;
 				for (int x = 0; x < param->nInput; x++) {
 					for (int y = 0; y < param->nHide; y++) {
@@ -781,7 +780,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 				}
 				double vMeanIH = vSumIH / (param->nInput * param->nHide);
 				std::cout << "vMeanIH : " << vMeanIH << std::endl;
-				*/
 			}
 
 			/* Update weight of the second layer (hidden layer to the output layer) */
@@ -1111,7 +1109,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 			/*For slope correction technique*/
 			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
 				std::cout << "Final Training (HO)" << std::endl;
-				/*/
 				double vSumHO = 0;
 				for (int z = 0; z < param->nHide; z++) {
 					for (int w = 0; w < param->nOutput; w++) {
@@ -1120,7 +1117,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 				}
 				double vMeanHO = vSumHO / (param->nHide * param->nOutput);
 				std::cout << "vMeanHO : " << vMeanHO << std::endl;
-				*/
 			}
 
 			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 2) {
