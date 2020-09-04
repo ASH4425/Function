@@ -212,7 +212,7 @@ void Validate() {
 				a1[j] = sigmoid(outN1[j]);
 				/*For slope correction technique*/
 				if (param->isFinalTrain) {
-					if (j == 10) { std::cout << "Use sigmoidMod" << std::endl; }
+					if (i == 0 && j == 10) { std::cout << "Use sigmoidMod" << std::endl; }
 					a1[j] = sigmoidMod(outN1[j], param->vMeanIHparam);
 				}
 				da1[j] = round_th(a1[j]*(param->numInputLevel-1), param->Hthreshold);
