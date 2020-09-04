@@ -41,6 +41,7 @@
 
 #include <vector>
 
+double sigmoidMod(double x, double factor); // For slope correction technique
 double sigmoid(double x);
 double truncate(double x, int numBit, double threshold=0.5);
 double round_th(double x, double threshold);
