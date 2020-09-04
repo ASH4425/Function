@@ -212,7 +212,7 @@ void Validate() {
 				a1[j] = sigmoid(outN1[j]);
 				/*For slope correction technique*/
 				if (param->isFinalTrain) {
-					if (i == 10 && j == 10) { std::cout << "Use sigmoidMod" << std::endl; }
+					if (i == 10 && j == 10) { std::cout << "vMeanIH in Test.cpp : " << param->vMeanIHparam << std::endl; }
 					a1[j] = sigmoidMod(outN1[j], param->vMeanIHparam);
 				}
 				da1[j] = round_th(a1[j]*(param->numInputLevel-1), param->Hthreshold);
@@ -351,6 +351,11 @@ void Validate() {
 						} 
 				}
 				a2[j] = sigmoid(outN2[j]);
+				/*For slope correction technique*/
+				if (param->isFinalTrain) {
+					a2[j] = sigmoidMod(outN2[j], param->vMeanHOparam);
+				}
+
 				if (a2[j] > tempMax) {
 					tempMax = a2[j];
 					countNum = j;
