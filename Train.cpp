@@ -638,22 +638,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 								}
 							}
 						}
-                        
-						/*For slope correction technique*/
-						if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-							std::cout << "Final Training" << std::endl;
-							/*
-							double vSumIH = 0;
-							for (int x = 0; x < param->nInput; x++) {
-								for (int y = 0; y < param->nHide; y++) {
-									vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[y][x])->driftCoeff;
-								}
-							}
-							double vMeanIH = vSumIH / (param->nInput * param->nHide);
-							std::cout << "vMeanIH : " << vMeanIH << std::endl;
-							*/
-						}
-
+                       
 						/* Latency for each batch write in Analog eNVM */
 						if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayIH->cell[0][0])) {	// Analog eNVM
 							sumWriteLatencyAnalogNVM += maxLatencyLTP + maxLatencyLTD;
@@ -782,6 +767,21 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 						}
 					}
 				}
+			}
+
+			/*For slope correction technique*/
+			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+				std::cout << "Final Training" << std::endl;
+				/*
+				double vSumIH = 0;
+				for (int x = 0; x < param->nInput; x++) {
+					for (int y = 0; y < param->nHide; y++) {
+						vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[y][x])->driftCoeff;
+					}
+				}
+				double vMeanIH = vSumIH / (param->nInput * param->nHide);
+				std::cout << "vMeanIH : " << vMeanIH << std::endl;
+				*/
 			}
 
 			/* Update weight of the second layer (hidden layer to the output layer) */
@@ -979,21 +979,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 							}
 						}
 
-						/*For slope correction technique*/
-						if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-							std::cout << "Final Training (HO)" << std::endl;
-							/*/
-							double vSumHO = 0;
-							for (int z = 0; z < param->nHide; z++) {
-								for (int w = 0; w < param->nOutput; w++) {
-									vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[w][z])->driftCoeff;
-								}
-							}
-							double vMeanHO = vSumHO / (param->nHide * param->nOutput);
-							std::cout << "vMeanHO : " << vMeanHO << std::endl;
-							*/
-						}
-
 						/* Latency for each batch write in Analog eNVM */
 						if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayHO->cell[0][0])) {  // Analog eNVM
 							sumWriteLatencyAnalogNVM += maxLatencyLTP + maxLatencyLTD;
@@ -1122,6 +1107,22 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 					}
 				}
 			}
+
+			/*For slope correction technique*/
+			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+				std::cout << "Final Training (HO)" << std::endl;
+				/*/
+				double vSumHO = 0;
+				for (int z = 0; z < param->nHide; z++) {
+					for (int w = 0; w < param->nOutput; w++) {
+						vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[w][z])->driftCoeff;
+					}
+				}
+				double vMeanHO = vSumHO / (param->nHide * param->nOutput);
+				std::cout << "vMeanHO : " << vMeanHO << std::endl;
+				*/
+			}
+
 			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 2) {
 				param->isFinalTrain = true;
 			}else {
