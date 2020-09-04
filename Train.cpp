@@ -588,7 +588,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 							}
 
 								/*For slope correction technique*/
-								if (param->isFinalTrain) {
+								if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
 									double vSumIH = 0;
 									for (int x = 0; x < param->nInput; x++) {
 										for (int y = 0; y < param->nHide; y++) {
@@ -597,7 +597,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 									}
 									double vMeanIH = vSumIH / (param->nInput * param->nHide);
 									std::cout << "vMeanIH : " << vMeanIH << std::endl;
-
 								}
        
                             else {	// SRAM and digital eNVM
@@ -913,8 +912,6 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 									arrayHO->DriftWriteCell(jj, k, weight2[jj][k], cycleWaitTimeHO[jj][k]);
 								}
 
-								
-
 							    weight2[jj][k] = arrayHO->ConductanceToWeight(jj, k, param->maxWeight, param->minWeight);
 								weightChangeBatch = weightChangeBatch || static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->numPulse;
                                 if(fabs(static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->numPulse) > maxPulseNum)
@@ -928,7 +925,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 									maxLatencyLTD = static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->writeLatencyLTD;
 							}
 								/*For slope correction technique*/
-								if (param->isFinalTrain) {								
+								if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
 									double vSumHO = 0;
 									for (int z = 0; z < param->nHide; z++) {
 										for (int w = 0; w < param->nOutput; w++) {
@@ -1121,8 +1118,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 			}
 			if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 2) {
 				param->isFinalTrain = true;
-			}
-			else {
+			}else {
 				param->isFinalTrain = false;
 			}
 
