@@ -44,6 +44,11 @@ double sigmoid(double x) {
 	return 1 / (1 + exp(-x));
 }
 
+/*Modified Activation function (For slope correction technique)*/
+double sigmoidMod(double x, double factor) {
+	return 1 / (1 + exp(-(x* pow((2.628e+6 / 1e-06), factor)));
+}
+
 /* Truncation with a custom threshold */
 double truncate(double x, int numLevel, double threshold) {
 	if (numLevel <= 0) {   // No truncation if numLevel <= 0
