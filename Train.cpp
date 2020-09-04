@@ -262,6 +262,10 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 						}
 					}
 					a1[j] = sigmoid(outN1[j]);
+					if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+						std::cout << "Final training (ReadIH)" << std::endl;
+						//a1[j] = sigmoidMod(outN1[j]);
+					}
 					da1[j] = round_th(a1[j]*(param->numInputLevel-1), param->Hthreshold);
 				}
 				arrayIH->readEnergy += sumArrayReadEnergy;
