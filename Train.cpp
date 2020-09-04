@@ -585,23 +585,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 									maxLatencyLTP = static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->writeLatencyLTP;
 								if (static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->writeLatencyLTD > maxLatencyLTD)
 									maxLatencyLTD = static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->writeLatencyLTD;
-							}
-
-								/*For slope correction technique*/
-								if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-									std::cout << "Final Training" << std::endl;
-									/*
-									double vSumIH = 0;
-									for (int x = 0; x < param->nInput; x++) {
-										for (int y = 0; y < param->nHide; y++) {
-											vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[y][x])->driftCoeff;
-										}
-									}
-									double vMeanIH = vSumIH / (param->nInput * param->nHide);
-									std::cout << "vMeanIH : " << vMeanIH << std::endl;
-									*/
-								}
-       
+							}      
                             else {	// SRAM and digital eNVM
                                 weight1[jj][k] = weight1[jj][k] + deltaWeight1[jj][k];
 								arrayIH->WriteCell(jj, k, deltaWeight1[jj][k], weight1[jj][k], param->maxWeight, param->minWeight, true);
@@ -655,6 +639,21 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 							}
 						}
                         
+						/*For slope correction technique*/
+						if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+							std::cout << "Final Training" << std::endl;
+							/*
+							double vSumIH = 0;
+							for (int x = 0; x < param->nInput; x++) {
+								for (int y = 0; y < param->nHide; y++) {
+									vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[y][x])->driftCoeff;
+								}
+							}
+							double vMeanIH = vSumIH / (param->nInput * param->nHide);
+							std::cout << "vMeanIH : " << vMeanIH << std::endl;
+							*/
+						}
+
 						/* Latency for each batch write in Analog eNVM */
 						if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayIH->cell[0][0])) {	// Analog eNVM
 							sumWriteLatencyAnalogNVM += maxLatencyLTP + maxLatencyLTD;
@@ -927,22 +926,7 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 								if (static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->writeLatencyLTD > maxLatencyLTD)
 									maxLatencyLTD = static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->writeLatencyLTD;
 							}
-								/*For slope correction technique*/
-								if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
-									std::cout << "Final Training (HO)" << std::endl;
-									/*/
-									double vSumHO = 0;
-									for (int z = 0; z < param->nHide; z++) {
-										for (int w = 0; w < param->nOutput; w++) {
-											vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[w][z])->driftCoeff;
-										}
-									}
-									double vMeanHO = vSumHO / (param->nHide * param->nOutput);
-									std::cout << "vMeanHO : " << vMeanHO << std::endl;
-									*/
-								}
-
-
+								
                             else {    // SRAM and digital eNVM
 								weight2[jj][k] = weight2[jj][k] + deltaWeight2[jj][k];
 								arrayHO->WriteCell(jj, k, deltaWeight2[jj][k], weight2[jj][k], param->maxWeight, param->minWeight, true);
@@ -994,6 +978,22 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 								}
 							}
 						}
+
+						/*For slope correction technique*/
+						if (param->currentEpoch == param->totalNumEpochs && batchSize == numTrain - 1) {
+							std::cout << "Final Training (HO)" << std::endl;
+							/*/
+							double vSumHO = 0;
+							for (int z = 0; z < param->nHide; z++) {
+								for (int w = 0; w < param->nOutput; w++) {
+									vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[w][z])->driftCoeff;
+								}
+							}
+							double vMeanHO = vSumHO / (param->nHide * param->nOutput);
+							std::cout << "vMeanHO : " << vMeanHO << std::endl;
+							*/
+						}
+
 						/* Latency for each batch write in Analog eNVM */
 						if (AnalogNVM *temp = dynamic_cast<AnalogNVM*>(arrayHO->cell[0][0])) {  // Analog eNVM
 							sumWriteLatencyAnalogNVM += maxLatencyLTP + maxLatencyLTD;
