@@ -590,13 +590,13 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 								/*For slope correction technique*/
 								if (param->isFinalTrain) {
 									double vSumIH = 0;
-									for (k = 0; k < param->nInput; k++) {
-										for (jj = 0; jj < param->nHide; jj++) {
-											vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[jj][k])->driftCoeff;
+									for (int x = 0; x < param->nInput; x++) {
+										for (int y = 0; y < param->nHide; y++) {
+											vSumIH += static_cast<AnalogNVM*>(arrayIH->cell[y][x])->driftCoeff;
 										}
 									}
 									double vMeanIH = vSumIH / (param->nInput * param->nHide);
-									//std::cout << "vMeanIH : " << vMeanIH << std::endl;
+									std::cout << "vMeanIH : " << vMeanIH << std::endl;
 
 								}
        
@@ -930,9 +930,9 @@ double s2[param->nOutput];  // Output delta from hidden layer to the output laye
 								/*For slope correction technique*/
 								if (param->isFinalTrain) {								
 									double vSumHO = 0;
-									for (k = 0; k < param->nHide; k++) {
-										for (jj = 0; jj < param->nOutput; jj++) {
-											vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[jj][k])->driftCoeff;
+									for (int z = 0; z < param->nHide; z++) {
+										for (int w = 0; w < param->nOutput; w++) {
+											vSumHO += static_cast<AnalogNVM*>(arrayHO->cell[w][z])->driftCoeff;
 										}
 									}
 									double vMeanHO = vSumHO / (param->nHide * param->nOutput);
