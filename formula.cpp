@@ -46,7 +46,7 @@ double sigmoid(double x) {
 
 /*Modified Activation function (For slope correction technique)*/
 double sigmoidMod(double x, double factor) {
-	return 1 / (1 + exp(-(x* pow((60 / 1e-06), factor))));
+	return 1 / (1 + exp(-(x* pow((60 / 2.628e+6), factor))));
 }
 
 /* Truncation with a custom threshold */
